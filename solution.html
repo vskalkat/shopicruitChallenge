@@ -1,0 +1,225 @@
+<html>
+
+<head>
+
+    <title>Shopicruit Challenge</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+
+
+    <style>
+        body {
+            background-color: #30373B;
+        }
+        
+        h1 {
+            font-family: Candara, Calibri, Segoe, Segoe UI, Optima, Arial, sans-serif;
+            font-size: 44px;
+            font-style: italic;
+            font-weight: bold;
+            color: white;
+        }
+        
+        button {
+            padding: 15px;
+            font-family: Candara, Calibri, Segoe, Segoe UI, Optima, Arial, sans-serif;
+            font-size: 18px;
+            font-weight: 900;
+            background-color: #6AB744;
+            color: white;
+            cursor: pointer;
+            border-radius: 7px;
+            border-color: #6AB744;
+            margin-bottom:20px;
+        }
+        
+        button:hover {
+            background-color: #6AA74C;
+        }
+        
+        div {
+            width: 800px;
+            margin: auto;
+            font-family: Candara, Calibri, Segoe, Segoe UI, Optima, Arial, sans-serif;
+            font-size: 14px;
+            font-style: normal;
+            font-variant: normal;
+            font-weight: 400;
+            line-height: 20px;
+        }
+        
+        #titleDiv {
+            height: 225px;
+        }
+        
+        #shopifyLogo {
+            display: inline-block;
+            vertical-align: middle;
+        }
+        #applicant{
+            color: #D5D5D5;
+            font-size: 12px;
+            
+        }
+        
+        #centerDiv {
+            text-align: center;
+        }
+        
+        #totalCost {
+            text-align: left;
+            width: 600px;
+            padding: 20px;
+            font-weight: 900;
+            font-size: 20px;
+            color: white;
+        }
+        
+        #dataOutput {
+            color: #D5D5D5;
+            text-align: left;
+            width: 600px;
+            height: 200px;
+            overflow: scroll;
+            padding: 10px;
+            background-color: #2C3235;
+        }
+    </style>
+
+
+</head>
+
+
+<body>
+
+    <div id="centerDiv">
+        <div id="titleDiv">
+            <h1>
+                <img id="shopifyLogo" src="https://cdn.shopify.com/assets/images/logos/shopify-bag.png">
+                Shopicruit Challenge
+                <small id="applicant">Applicant: Vik Kalkat</small>
+            </h1>
+        </div>
+
+        <button onClick="getProducts()">
+            Get Shit Done!
+        </button>
+        <br>
+    </div>
+
+    <div id="dataOutput"></div>
+    <div id="totalCost"></div>
+
+    <script>
+        var totalCost = 0;
+        var products = [];
+        var numItems = 0;
+
+
+        /////////////////////////
+
+
+        function getProducts() {
+            var dfd = $.Deferred();
+
+            dfd.done(function () {
+                console.log("products: " + products);
+
+                for (var i = 1; i <= 5; i++) {
+                    $.each(products[i], function (productIndex, productVal) {
+                        if (productVal.product_type == "Watch" || productVal.product_type == "Clock") {
+                            $.each(productVal.variants, function (variantIndex, variantVal) {
+                                ++numItems;
+                                $("#dataOutput").append(numItems + ". " + variantVal.title + "  <small>" + productVal.product_type + "</small> : $" + variantVal.price + "<br>");
+                                totalCost += parseFloat(variantVal.price);
+                            });
+                        };
+                    });
+                };
+                $("#totalCost").text("Total Cost: $" + totalCost.toFixed(2));
+
+            });
+
+
+            var JSON1 = $.get("http://shopicruit.myshopify.com/products.json?page=1");
+            var JSON2 = $.get("http://shopicruit.myshopify.com/products.json?page=2");
+            var JSON3 = $.get("http://shopicruit.myshopify.com/products.json?page=3");
+            var JSON4 = $.get("http://shopicruit.myshopify.com/products.json?page=4");
+            var JSON5 = $.get("http://shopicruit.myshopify.com/products.json?page=5");
+            var JSON6 = $.get("http://shopicruit.myshopify.com/products.json?page=6");
+            var JSONAll = $.when(JSON1, JSON2, JSON3, JSON4, JSON5, JSON6);
+
+
+            JSONAll.then(function () {
+                products.push(JSON1.responseJSON.products);
+                products.push(JSON2.responseJSON.products);
+                products.push(JSON3.responseJSON.products);
+                products.push(JSON4.responseJSON.products);
+                products.push(JSON5.responseJSON.products);
+                products.push(JSON6.responseJSON.products);
+
+                dfd.resolve();
+            });
+
+        };
+
+
+
+        /////////////////////////
+
+
+
+        //
+        //
+        //
+        //        function mySolution() {
+        //            for (i = 0; i < 7; i++) {
+        //                $.getJSON("http://shopicruit.myshopify.com/products.json?page=" + i, function (data) {
+        //                    products = data.products;
+        //                    $.each(products, function (productIndex, productVal) {
+        //                        $("#dataOutput").append("<b>" + productVal.title + "</b> <small> -" + productVal.product_type + "</small><br>");
+        //                        $.each(productVal.variants, function (variantIndex, variantVal) {
+        //                            $("#dataOutput").append(variantIndex + ". " + variantVal.title + " : " + variantVal.price + "<br>");
+        //                            costPerJSON += parseFloat(variantVal.price);
+        //                        });
+        //                        $("#dataOutput").append("<hr>");
+        //                    });
+        //                }).then(
+        //                    totalCost += costPerJSON;
+        //                );
+        //            };
+        //            console.log("TOTAL:" + totalCost.toFixed(2));
+        //        };
+        //
+        //        function printResult() {
+        //            $("#totalCost").append("Finished! " + totalCost.toFixed(2) + "<br>");
+        //        };
+        //
+        //
+        //        ));
+
+
+
+
+
+
+
+        //          $("button").on("click", function () {
+        //            $("h3").append(" Started... ");
+        //            
+        //            $.when( mySolution() ).then(function(){
+        //                $("#totalCost").append("Finished! " + totalCost.toFixed(2) + "<br>");
+        //                console.log("totalcost:" + totalCost);
+        //            });
+        //        });
+
+
+
+        //        $("#dataOutput").append(" Finished! " + totalCost.toFixed(2) + "<br>");
+    </script>
+
+
+
+</body>
+
+</html>
